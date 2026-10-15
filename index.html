@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Great Khan's Royal Foot Care & Imperial Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Marcellus&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Marcellus', serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    
+    /* Custom Scrollbar for sidebars */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a120b; }
+    ::-webkit-scrollbar-thumb { background: #8b5a2b; border-radius: 3px; }
+
+    /* Tool cursor preview */
+    .tool-btn {
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+    .tool-btn.active {
+      transform: translateY(-2px);
+      border-color: #f59e0b;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    }
+    
+    /* Animation pulse for urgent anger */
+    @keyframes angerPulse {
+      0%, 100% { background-color: rgba(220, 38, 38, 0.2); }
+      50% { background-color: rgba(220, 38, 38, 0.6); }
+    }
+    .anger-critical {
+      animation: angerPulse 0.8s infinite;
+    }
+  </style>
+</head>
+<body class="bg-stone-950 text-amber-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-amber-800 selection:text-white">
+
+  <!-- Top Navigation & Header -->
+  <header class="bg-stone-900/90 border-b-2 border-amber-700/60 px-4 py-3 flex flex-wrap justify-between items-center z-10 shadow-lg backdrop-blur-md">
+    <div class="flex items-center space-x-3">
+      <span class="text-3xl">⛺</span>
+      <div>
+        <h1 class="font-cinzel text-xl sm:text-2xl font-bold tracking-wider text-amber-400">The Great Khan's Royal Foot Care</h1>
+        <p class="text-xs text-stone-400">Imperial Yurt Podiatry Services — Year 1206</p>
+      </div>
+    </div>
+
+    <!-- Currency, Audio Toggle, Shop & Instructions Buttons -->
+    <div class="flex items-center space-x-3 mt-2 sm:mt-0">
+      <div class="bg-stone-950 border border-amber-600/60 px-3 py-1 rounded-lg flex items-center gap-1.5 shadow">
+        <span>🪙</span> <span id="goldDisplay" class="font-bold text-amber-300 text-sm">250</span>
+      </div>
+      <button onclick="openModal('shopModal')" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 border border-amber-400 px-3 py-1.5 rounded-lg text-sm font-semibold transition shadow flex items-center gap-1">
+        🛒 <span>Imperial Shop</span>
+      </button>
+      <button id="audioToggle" onclick="toggleAudio()" class="bg-stone-800 hover:bg-stone-700 border border-amber-700/50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 transition">
+        <span id="audioIcon">🔊</span> <span id="audioText">Sound: ON</span>
+      </button>
+      <button onclick="openModal('instructionsModal')" class="bg-stone-800 hover:bg-stone-700 border border-amber-500/50 px-3 py-1.5 rounded-lg text-sm font-semibold transition shadow">
+        📖 Manual
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Game Container -->
+  <main class="flex-1 flex flex-col lg:flex-row items-center justify-center p-2 sm:p-4 gap-4 max-w-7xl mx-auto w-full">
+    
+    <!-- Left Sidebar: Progress & Khan Status -->
+    <div class="w-full lg:w-72 bg-stone-900/80 border border-stone-800 rounded-xl p-4 shadow-xl flex flex-col gap-4">
+      <!-- Stage Tracker -->
+      <div>
+        <h2 class="text-xs font-cinzel font-bold text-amber-500 uppercase tracking-widest mb-2">Current Treatment</h2>
+        <div id="stageCard" class="bg-stone-950/80 border border-amber-700/40 rounded-lg p-3 text-center">
+          <div id="stageIcon" class="text-3xl mb-1">🧼</div>
+          <div id="stageTitle" class="font-cinzel font-bold text-amber-300 text-lg">Stage 1: Mud & Dirt</div>
+          <div id="stageDesc" class="text-xs text-stone-300 mt-1">Scrub off dried steppe mud with sponge and brush!</div>
+        </div>
+      </div>
+
+      <!-- Stage Checklist -->
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between items-center text-stone-400">
+          <span>Stage Progress:</span>
+          <span id="stageProgressText" class="font-bold text-amber-400">0%</span>
+        </div>
+        <div class="w-full bg-stone-950 rounded-full h-2.5 overflow-hidden border border-stone-800">
+          <div id="stageProgressBar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Khan Anger Meter -->
+      <div class="border-t border-stone-800 pt-3">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-cinzel font-bold text-red-400 tracking-wider flex items-center gap-1">
+            <span>😠</span> KHAN'S IRRITATION
+          </span>
+          <span id="angerText" class="text-xs font-bold text-stone-300">0%</span>
+        </div>
+        <div id="angerMeterContainer" class="w-full bg-stone-950 rounded-full h-4 overflow-hidden border border-red-950 p-0.5">
+          <div id="angerBar" class="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 h-3 rounded-full transition-all duration-200" style="width: 0%"></div>
+        </div>
+        <p id="khanMoodText" class="text-[11px] text-stone-400 italic text-center mt-2">"Zzz... Khan slumbers peacefully..."</p>
+      </div>
+
+      <!-- Timer & Score -->
+      <div class="grid grid-cols-2 gap-2 text-center border-t border-stone-800 pt-3">
+        <div class="bg-stone-950/60 p-2 rounded-lg border border-stone-800/80">
+          <span class="text-[10px] text-stone-400 block uppercase">Time Elapsed</span>
+          <span id="timerText" class="text-sm font-bold text-amber-300">00:00</span>
+        </div>
+        <div class="bg-stone-950/60 p-2 rounded-lg border border-stone-800/80">
+          <span class="text-[10px] text-stone-400 block uppercase">Honor Score</span>
+          <span id="scoreText" class="text-sm font-bold text-amber-300">1000</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Interactive Canvas Area -->
+    <div class="flex-1 flex flex-col items-center w-full">
+      <div class="relative w-full max-w-[720px] aspect-[4/3] rounded-2xl overflow-hidden border-4 border-amber-900/80 shadow-2xl bg-stone-900 group">
+        <canvas id="gameCanvas" width="800" height="600" class="w-full h-full block cursor-none"></canvas>
+        
+        <!-- Floating Canvas Stage Overlay Indicator -->
+        <div id="canvasStageBanner" class="absolute top-3 left-1/2 -translate-x-1/2 bg-stone-950/80 backdrop-blur border border-amber-600/50 px-4 py-1 rounded-full text-xs font-cinzel text-amber-300 pointer-events-none shadow-lg">
+          Stage 1 / 4 — Scrub the Mud
+        </div>
+
+        <!-- Custom Tool Cursor Element -->
+        <div id="customCursor" class="pointer-events-none fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 z-50 text-3xl transition-transform duration-75 hidden">
+          💧
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Interactive Royal Inventory -->
+    <div class="w-full lg:w-72 bg-stone-900/80 border border-stone-800 rounded-xl p-4 shadow-xl flex flex-col gap-3">
+      <h2 class="text-xs font-cinzel font-bold text-amber-500 uppercase tracking-widest text-center">Royal Tool Kit</h2>
+      <p class="text-[11px] text-stone-400 text-center -mt-2">Select the required tool for each stage!</p>
+
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Tool 1: Sponge -->
+        <button id="tool-sponge" onclick="selectTool('sponge')" class="tool-btn active bg-stone-800 hover:bg-stone-700 border-2 border-stone-700 rounded-xl p-2.5 flex flex-col items-center text-center">
+          <span class="text-2xl mb-1">💧</span>
+          <span class="text-xs font-bold text-amber-200">Warm Sponge</span>
+          <span class="text-[10px] text-stone-400 mt-0.5">Stage 1 Mud</span>
+        </button>
+
+        <!-- Tool 2: Horsehair Brush -->
+        <button id="tool-brush" onclick="selectTool('brush')" class="tool-btn bg-stone-800 hover:bg-stone-700 border-2 border-stone-700 rounded-xl p-2.5 flex flex-col items-center text-center">
+          <span class="text-2xl mb-1">🌾</span>
+          <span class="text-xs font-bold text-amber-200">Horsehair Brush</span>
+          <span class="text-[10px] text-stone-400 mt-0.5">Stage 1 Grime</span>
+        </button>
+
+        <!-- Tool 3: Pumice Stone -->
+        <button id="tool-pumice" onclick="selectTool('pumice')" class="tool-btn bg-stone-800 hover:bg-stone-700 border-2 border-stone-700 rounded-xl p-2.5 flex flex-col items-center text-center">
+          <span class="text-2xl mb-1">🪨</span>
+          <span class="text-xs font-bold text-amber-200">Pumice Stone</span>
+          <span class="text-[10px] text-stone-400 mt-0.5">Stage 2 Callus</span>
+        </button>
+
+        <!-- Tool 4: Bronze Clippers -->
+        <button id="tool-clipper" onclick="selectTool('clipper')" class="tool-btn bg-stone-800 hover:bg-stone-700 border-2 border-stone-700 rounded-xl p-2.5 flex flex-col items-center text-center">
+          <span class="text-2xl mb-1">✂️</span>
+          <span class="text-xs font-bold text-amber-200">Bronze Clippers</span>
+          <span class="text-[10px] text-stone-400 mt-0.5">Stage 3 Nails</span>
+        </button>
+
+        <!-- Tool 5: Horn File -->
+        <button id="tool-file" onclick="selectTool('file')" class="tool-btn bg-stone-800 hover:bg-stone-700 border-2 border-stone-700 rounded-xl p-2.5 flex flex-col items-center text-center">
+          <span class="text-2xl mb-1">💅</span>
+          <span class="text-xs font-bold text-amber-200">Horn Nail File</span>
+          <span class="text-[10px] text-stone-400 mt-0.5">Stage 3 Smooth</span>
+        </button>
+
+        <!-- Tool 6: Royal Salve -->
+        <button id="tool-salve" onclick="selectTool('salve')" class="tool-btn bg-stone-800 hover:bg-stone-700 border-2 border-stone-700 rounded-xl p-2.5 flex flex-col items-center text-center">
+          <span class="text-2xl mb-1">🧴</span>
+          <span class="text-xs font-bold text-amber-200">Herbal Salve</span>
+          <span class="text-[10px] text-stone-400 mt-0.5">Stage 4 Massage</span>
+        </button>
+      </div>
+
+      <!-- Action hint box -->
+      <div id="toolTipBox" class="mt-auto bg-stone-950/90 border border-amber-900/40 rounded-lg p-2.5 text-xs text-amber-300/90 text-center italic">
+        "Drag warm sponge gently over dirt patches to soften the steppe mud."
+      </div>
+    </div>
+  </main>
+
+  <!-- Imperial Bazaar & Shop Modal -->
+  <div id="shopModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-stone-900 border-2 border-amber-500 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative flex flex-col max-h-[90vh]">
+      <button onclick="closeModal('shopModal')" class="absolute top-4 right-4 text-stone-400 hover:text-white text-xl">✕</button>
+      
+      <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-3">
+        <div>
+          <h2 class="font-cinzel text-2xl font-bold text-amber-400 flex items-center gap-2">🛒 Imperial Bazaar & Tool Shop</h2>
+          <p class="text-xs text-stone-400">Upgrade your royal equipment with earned gold coins!</p>
+        </div>
+        <div class="bg-stone-950 border border-amber-600/60 px-4 py-2 rounded-xl flex items-center gap-2 shadow">
+          <span>🪙</span> <span id="shopGoldDisplay" class="font-bold text-amber-300 text-base">250</span>
+        </div>
+      </div>
+
+      <!-- Shop Items List -->
+      <div class="space-y-3 overflow-y-auto pr-2 flex-1">
+        
+        <!-- Shop Item 1 -->
+        <div class="bg-stone-950 border border-stone-800 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl bg-stone-900 p-2.5 rounded-lg border border-stone-800">🧽</span>
+            <div>
+              <h3 class="font-cinzel font-bold text-amber-300 text-sm">Golden Silk Sponge</h3>
+              <p class="text-xs text-stone-400">Increases mud cleaning radius by 30%.</p>
+              <span id="item-sponge-level" class="text-[10px] text-amber-500 font-semibold mt-0.5 inline-block">Owned: Level 1</span>
+            </div>
+          </div>
+          <button id="btn-buy-sponge" onclick="buyShopItem('sponge')" class="bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold px-4 py-2 rounded-lg text-xs transition shadow flex items-center gap-1">
+            <span>🪙</span> <span id="price-sponge">100</span>
+          </button>
+        </div>
+
+        <!-- Shop Item 2 -->
+        <div class="bg-stone-950 border border-stone-800 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl bg-stone-900 p-2.5 rounded-lg border border-stone-800">💎</span>
+            <div>
+              <h3 class="font-cinzel font-bold text-amber-300 text-sm">Diamond-Edge Clippers</h3>
+              <p class="text-xs text-stone-400">Makes nail trimming wider and much more forgiving.</p>
+              <span id="item-clipper-level" class="text-[10px] text-amber-500 font-semibold mt-0.5 inline-block">Owned: Level 1</span>
+            </div>
+          </div>
+          <button id="btn-buy-clipper" onclick="buyShopItem('clipper')" class="bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold px-4 py-2 rounded-lg text-xs transition shadow flex items-center gap-1">
+            <span>🪙</span> <span id="price-clipper">150</span>
+          </button>
+        </div>
+
+        <!-- Shop Item 3 -->
+        <div class="bg-stone-950 border border-stone-800 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl bg-stone-900 p-2.5 rounded-lg border border-stone-800">🍵</span>
+            <div>
+              <h3 class="font-cinzel font-bold text-amber-300 text-sm">Calming Chamomile Tea</h3>
+              <p class="text-xs text-stone-400">Instantly lowers Khan's irritation level by 25% when consumed.</p>
+              <span id="item-tea-count" class="text-[10px] text-amber-500 font-semibold mt-0.5 inline-block">In Stock: 0</span>
+            </div>
+          </div>
+          <button onclick="buyShopItem('tea')" class="bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold px-4 py-2 rounded-lg text-xs transition shadow flex items-center gap-1">
+            <span>🪙</span> <span>75</span>
+          </button>
+        </div>
+
+        <!-- Shop Item 4 -->
+        <div class="bg-stone-950 border border-stone-800 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl bg-stone-900 p-2.5 rounded-lg border border-stone-800">🛡️</span>
+            <div>
+              <h3 class="font-cinzel font-bold text-amber-300 text-sm">Imperial Charm of Patience</h3>
+              <p class="text-xs text-stone-400">Reduces all future irritation spikes by 20% permanently.</p>
+              <span id="item-charm-status" class="text-[10px] text-stone-500 font-semibold mt-0.5 inline-block">Not Owned</span>
+            </div>
+          </div>
+          <button id="btn-buy-charm" onclick="buyShopItem('charm')" class="bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold px-4 py-2 rounded-lg text-xs transition shadow flex items-center gap-1">
+            <span>🪙</span> <span>300</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-stone-800 flex justify-between items-center">
+        <button onclick="useTea()" id="useTeaBtn" class="bg-emerald-800 hover:bg-emerald-700 text-white font-cinzel font-bold px-4 py-2 rounded-xl text-xs transition shadow flex items-center gap-1.5 opacity-50 cursor-not-allowed" disabled>
+          🍵 Drink Calming Tea (0)
+        </button>
+        <button onclick="closeModal('shopModal')" class="bg-stone-800 hover:bg-stone-700 text-amber-200 font-cinzel font-bold px-5 py-2 rounded-xl text-xs transition shadow">
+          Return to Yurt ⛺
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instructions Modal -->
+  <div id="instructionsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-stone-900 border-2 border-amber-600 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+      <button onclick="closeModal('instructionsModal')" class="absolute top-4 right-4 text-stone-400 hover:text-white text-xl">✕</button>
+      <h2 class="font-cinzel text-2xl font-bold text-amber-400 mb-3 flex items-center gap-2">📜 Royal Podiatry Manual</h2>
+      <div class="space-y-3 text-xs sm:text-sm text-stone-300 max-h-96 overflow-y-auto pr-2">
+        <p class="text-amber-200 font-semibold">Welcome, Chief Podiatrist! The Great Khan has returned weary from victory across the steppe. Treat his foot with imperial care!</p>
+        
+        <div class="bg-stone-950 p-3 rounded-lg border border-stone-800">
+          <h3 class="font-bold text-amber-400 mb-1">Step-by-Step Procedure:</h3>
+          <ul class="list-disc pl-4 space-y-1">
+            <li><strong class="text-amber-200">Stage 1 (Mud Cleaning):</strong> Use 💧 <b>Sponge</b> or 🌾 <b>Brush</b> to drag over dirt spots until 100% clean.</li>
+            <li><strong class="text-amber-200">Stage 2 (Callus Removal):</strong> Use 🪨 <b>Pumice Stone</b> to smooth tough heel and pad calluses.</li>
+            <li><strong class="text-amber-200">Stage 3 (Toenails):</strong> Trim long nails with ✂️ <b>Clippers</b>, then smooth sharp edges with 💅 <b>File</b>.</li>
+            <li><strong class="text-amber-200">Stage 4 (Massage & Salve):</strong> Rub 🧴 <b>Herbal Salve</b> across the sole to bring it to a brilliant shine!</li>
+          </ul>
+        </div>
+
+        <div class="bg-stone-950 p-3 rounded-lg border border-red-900/50">
+          <h3 class="font-bold text-red-400 mb-1">⚠️ Royal Warnings & Tickle Spots:</h3>
+          <ul class="list-disc pl-4 space-y-1">
+            <li><b>Tickle Area:</b> Scrubbing the center arch too fast causes ticklish laughter and spikes Khan's irritation!</li>
+            <li><b>Wrong Tool:</b> Using clippers or pumice on fresh skin or wrong stage will anger the Khan!</li>
+            <li><b>100% Irritation = EXILE!</b> Keep Khan pleased with careful, smooth strokes.</li>
+          </ul>
+        </div>
+      </div>
+      <button onclick="closeModal('instructionsModal')" class="w-full mt-5 bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold py-2.5 rounded-xl transition shadow">
+        Understood, I Shall Serve The Khan
+      </button>
+    </div>
+  </div>
+
+  <!-- End Game Results Modal -->
+  <div id="resultsModal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-stone-900 border-2 border-amber-500 rounded-2xl max-w-md w-full p-6 shadow-2xl text-center relative overflow-hidden">
+      <!-- Background Rank Watermark -->
+      <div id="resultRankBg" class="absolute -bottom-10 -right-10 text-9xl opacity-10 font-cinzel font-black pointer-events-none">S</div>
+
+      <h2 id="resultTitle" class="font-cinzel text-3xl font-extrabold text-amber-400 mb-2">Pedicure Complete!</h2>
+      <p id="resultSubtitle" class="text-xs text-stone-300 mb-6">The Great Khan awakes refreshed and satisfied!</p>
+
+      <!-- Grade Display Circle -->
+      <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center rounded-full bg-gradient-to-tr from-amber-900 to-stone-800 border-4 border-amber-400 shadow-xl">
+        <span id="resultGrade" class="font-cinzel text-6xl font-black text-amber-300">S</span>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 gap-3 mb-6 text-xs">
+        <div class="bg-stone-950 p-3 rounded-lg border border-stone-800">
+          <span class="text-stone-400 block">Final Irritation</span>
+          <span id="finalAngerText" class="text-base font-bold text-emerald-400">0%</span>
+        </div>
+        <div class="bg-stone-950 p-3 rounded-lg border border-stone-800">
+          <span class="text-stone-400 block">Total Time</span>
+          <span id="finalTimeText" class="text-base font-bold text-amber-300">01:12</span>
+        </div>
+        <div class="bg-stone-950 p-3 rounded-lg border border-stone-800 col-span-2">
+          <span class="text-stone-400 block">Gold Reward Earned</span>
+          <span id="finalGoldEarnedText" class="text-xl font-cinzel font-extrabold text-amber-400">+150 🪙</span>
+        </div>
+      </div>
+
+      <p id="resultComment" class="text-xs italic text-amber-200/90 mb-6 bg-stone-950/60 p-3 rounded-lg border border-amber-900/40">
+        "You have brought true peace to the steppe. The Khan grants you a herd of 100 horses!"
+      </p>
+
+      <button onclick="restartGame()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-cinzel font-bold py-3 rounded-xl transition shadow-lg text-sm">
+        🔄 Perform Another Pedicure
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       AUDIO SYNTHESIZER (Web Audio API - No External Assets Needed)
+       ========================================================================== */
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('audioIcon').innerText = audioEnabled ? '🔊' : '🔇';
+      document.getElementById('audioText').innerText = audioEnabled ? 'Sound: ON' : 'Sound: OFF';
+    }
+
+    function playSound(type) {
+      if (!audioEnabled) return;
+      initAudio();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'scrub') {
+        const bufferSize = audioCtx.sampleRate * 0.1;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(800 + Math.random() * 400, now);
+        filter.Q.setValueAtTime(3, now);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(now);
+      } 
+      else if (type === 'snip') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1800, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+      } 
+      else if (type === 'file') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(3200, now);
+        osc.frequency.linearRampToValueAtTime(1200, now + 0.06);
+
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+      }
+      else if (type === 'salve') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+
+          gain.gain.setValueAtTime(0.04, now + idx * 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.03);
+        });
+      }
+      else if (type === 'grunt') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(65, now + 0.3);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+      }
+      else if (type === 'giggle') {
+        [350, 480, 400, 520].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.06);
+
+          gain.gain.setValueAtTime(0.15, now + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.06 + 0.05);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.06);
+        });
+      }
+      else if (type === 'stageComplete') {
+        [440, 554.37, 659.25, 880].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.1);
+
+          gain.gain.setValueAtTime(0.15, now + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.4);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.1);
+        });
+      }
+    }
+
+    /* ==========================================================================
+       GAME STATE & CONFIGURATION
+       ========================================================================== */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentStage = 1; // 1: Dirt, 2: Callus, 3: Nails, 4: Salve
+    let selectedTool = 'sponge';
+    let anger = 0; // 0 to 100
+    let score = 1000;
+    let gold = 250; // Starting Imperial Gold
+    let secondsElapsed = 0;
+    let timerInterval = null;
+    let isGameOver = false;
+    let isGameWon = false;
+
+    // Shop Upgrades State
+    let shopState = {
+      spongeLevel: 1,
+      spongePrice: 100,
+      clipperLevel: 1,
+      clipperPrice: 150,
+      teaCount: 0,
+      hasCharm: false
+    };
+
+    // Interactive Element Arrays
+    let dirtSpots = [];
+    let callusPatches = [];
+    let nails = [];
+    let salveShineSpots = [];
+    let particles = [];
+    let floatingTexts = [];
+
+    // Tickle mechanic trackers
+    let lastMousePos = { x: 0, y: 0 };
+    let mouseSpeed = 0;
+    let tickleCooldown = 0;
+
+    const TOOL_ICONS = {
+      sponge: '💧',
+      brush: '🌾',
+      pumice: '🪨',
+      clipper: '✂️',
+      file: '💅',
+      salve: '🧴'
+    };
+
+    const STAGE_CONFIG = {
+      1: {
+        title: "Stage 1: Mud & Dirt Cleaning",
+        icon: "🧼",
+        desc: "Use Warm Sponge or Brush to gently scrub all steppe mud spots!",
+        banner: "Stage 1 / 4 — Clean Dirt & Mud",
+        requiredTools: ['sponge', 'brush']
+      },
+      2: {
+        title: "Stage 2: Callus Smoothing",
+        icon: "🪨",
+        desc: "Rub Pumice Stone over hardened heel and sole calluses.",
+        banner: "Stage 2 / 4 — Smooth Calluses",
+        requiredTools: ['pumice']
+      },
+      3: {
+        title: "Stage 3: Toenail Care",
+        icon: "✂️",
+        desc: "Trim long nails with Clippers, then smooth with Horn File!",
+        banner: "Stage 3 / 4 — Trim & File Nails",
+        requiredTools: ['clipper', 'file']
+      },
+      4: {
+        title: "Stage 4: Herbal Massage",
+        icon: "🧴",
+        desc: "Rub Royal Herbal Salve over entire foot to create full shine!",
+        banner: "Stage 4 / 4 — Salve & Massage",
+        requiredTools: ['salve']
+      }
+    };
+
+    /* ==========================================================================
+       INIT & STAGE CREATION
+       ========================================================================== */
+    function initGame() {
+      currentStage = 1;
+      anger = 0;
+      score = 1000;
+      secondsElapsed = 0;
+      isGameOver = false;
+      isGameWon = false;
+      selectTool('sponge');
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isGameOver && !isGameWon) {
+          secondsElapsed++;
+          updateUI();
+        }
+      }, 1000);
+
+      setupStage(1);
+      updateUI();
+    }
+
+    function setupStage(stageNum) {
+      currentStage = stageNum;
+
+      if (stageNum === 1) {
+        dirtSpots = [];
+        for (let i = 0; i < 45; i++) {
+          dirtSpots.push({
+            x: 440 + Math.random() * 140 - (Math.random() * 40),
+            y: 280 + Math.random() * 180,
+            radius: 12 + Math.random() * 10,
+            opacity: 0.85 + Math.random() * 0.15,
+            cleaned: false
+          });
+        }
+      } 
+      else if (stageNum === 2) {
+        callusPatches = [
+          { x: 440, y: 400, rx: 35, ry: 25, progress: 0 },
+          { x: 480, y: 300, rx: 40, ry: 20, progress: 0 },
+          { x: 500, y: 230, rx: 25, ry: 15, progress: 0 }
+        ];
+      } 
+      else if (stageNum === 3) {
+        nails = [
+          { x: 405, y: 155, length: 18, trimmed: false, filed: 0, width: 22 },
+          { x: 445, y: 165, length: 16, trimmed: false, filed: 0, width: 18 },
+          { x: 480, y: 185, length: 15, trimmed: false, filed: 0, width: 16 },
+          { x: 510, y: 210, length: 14, trimmed: false, filed: 0, width: 14 },
+          { x: 535, y: 240, length: 12, trimmed: false, filed: 0, width: 12 }
+        ];
+      } 
+      else if (stageNum === 4) {
+        salveShineSpots = [];
+        for (let x = 400; x <= 520; x += 25) {
+          for (let y = 220; y <= 420; y += 25) {
+            salveShineSpots.push({ x, y, shined: false });
+          }
+        }
+      }
+
+      selectTool(STAGE_CONFIG[stageNum].requiredTools[0]);
+      playSound('stageComplete');
+      updateUI();
+    }
+
+    function selectTool(toolName) {
+      selectedTool = toolName;
+      document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`tool-${toolName}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const cursorEl = document.getElementById('customCursor');
+      cursorEl.innerText = TOOL_ICONS[toolName] || '🖐️';
+
+      const tips = {
+        sponge: "Warm Sponge: Drag gently over dirt spots to soften steppe mud.",
+        brush: "Horsehair Brush: Scrub stiff dirt away briskly.",
+        pumice: "Pumice Stone: Smooth thick calluses on heel & sole.",
+        clipper: "Bronze Clippers: Click directly on long toenails to trim them.",
+        file: "Horn File: Drag over trimmed nails to file smooth edges.",
+        salve: "Royal Salve: Rub smoothly across the sole for ultimate shine!"
+      };
+      document.getElementById('toolTipBox').innerText = `"${tips[toolName]}"`;
+    }
+
+    /* ==========================================================================
+       CANVAS RENDERING ENGINE
+       ========================================================================== */
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawYurtInterior();
+      drawBedAndKhan();
+      drawFootCloseUp();
+      drawStageElements();
+      drawParticlesAndEffects();
+
+      requestAnimationFrame(render);
+    }
+
+    function drawYurtInterior() {
+      ctx.fillStyle = '#2a1a10';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = '#3d2717';
+      ctx.lineWidth = 3;
+      const step = 40;
+      for (let x = -canvas.width; x < canvas.width * 2; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x + canvas.height, canvas.height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x - canvas.height, canvas.height);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#6b1d1d';
+      ctx.fillRect(40, 160, 720, 400);
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(50, 170, 700, 380);
+
+      ctx.strokeStyle = '#b8860b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(58, 178, 684, 364);
+    }
+
+    function drawBedAndKhan() {
+      ctx.fillStyle = '#4a2511';
+      ctx.fillRect(60, 200, 320, 180);
+      ctx.fillStyle = '#8b0000';
+      ctx.fillRect(60, 240, 320, 140);
+
+      ctx.fillStyle = '#d7c49e';
+      ctx.fillRect(60, 235, 320, 15);
+
+      ctx.fillStyle = '#e6c687';
+      ctx.beginPath();
+      ctx.ellipse(130, 225, 45, 25, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#d2a679';
+      ctx.beginPath();
+      ctx.arc(130, 210, 26, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1a100c';
+      ctx.beginPath();
+      ctx.arc(130, 195, 28, Math.PI, 0);
+      ctx.fill();
+      ctx.fillStyle = '#8b0000';
+      ctx.fillRect(118, 160, 24, 25);
+      ctx.fillStyle = '#d4af37';
+      ctx.beginPath();
+      ctx.arc(130, 155, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#3a2010';
+      ctx.lineWidth = 2;
+      
+      if (anger < 50) {
+        ctx.beginPath();
+        ctx.arc(120, 208, 4, 0.1, Math.PI - 0.1);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(140, 208, 4, 0.1, Math.PI - 0.1);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(115, 202); ctx.lineTo(125, 207);
+        ctx.moveTo(145, 202); ctx.lineTo(135, 207);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(120, 210, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(140, 210, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(120, 210, 1, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(140, 210, 1, 0, Math.PI * 2); ctx.fill();
+      }
+
+      ctx.fillStyle = '#1c130d';
+      ctx.beginPath();
+      ctx.moveTo(110, 218);
+      ctx.quadraticCurveTo(130, 255, 150, 218);
+      ctx.fill();
+
+      if (!isGameOver) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 16px "Cinzel", serif';
+        if (anger < 30) {
+          const zOff = (Math.sin(Date.now() / 300) * 8);
+          ctx.fillText("Z z z...", 170, 170 + zOff);
+        } else if (anger < 70) {
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillText("GRRR...", 170, 170);
+        } else {
+          ctx.fillStyle = '#ef4444';
+          ctx.fillText("⚡ BARK! ⚡", 170, 170);
+        }
+      }
+    }
+
+    function drawFootCloseUp() {
+      ctx.fillStyle = '#c89b6d';
+      ctx.beginPath();
+      ctx.moveTo(280, 310);
+      ctx.lineTo(410, 320);
+      ctx.lineTo(420, 420);
+      ctx.lineTo(280, 370);
+      ctx.fill();
+
+      ctx.fillStyle = '#d2a679';
+      ctx.beginPath();
+      ctx.ellipse(460, 350, 60, 105, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#c09263';
+      ctx.beginPath();
+      ctx.ellipse(425, 350, 22, 50, -0.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      const toeCoords = [
+        { x: 405, y: 175, r: 20 },
+        { x: 445, y: 182, r: 16 },
+        { x: 480, y: 198, r: 14 },
+        { x: 510, y: 222, r: 13 },
+        { x: 535, y: 250, r: 11 }
+      ];
+
+      toeCoords.forEach((toe) => {
+        ctx.fillStyle = '#d2a679';
+        ctx.beginPath();
+        ctx.arc(toe.x, toe.y, toe.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#b58555';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(toe.x, toe.y + toe.r * 0.6, toe.r * 0.7, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+      });
+
+      if (currentStage === 4 || isGameWon) {
+        const shineProgress = salveShineSpots.filter(s => s.shined).length / Math.max(1, salveShineSpots.length);
+        if (shineProgress > 0) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + shineProgress * 0.25})`;
+          ctx.beginPath();
+          ctx.ellipse(460, 340, 50, 90, -0.15, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function drawStageElements() {
+      dirtSpots.forEach(spot => {
+        if (!spot.cleaned) {
+          ctx.fillStyle = `rgba(66, 42, 22, ${spot.opacity})`;
+          ctx.beginPath();
+          ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = 'rgba(38, 22, 10, 0.6)';
+          ctx.beginPath();
+          ctx.arc(spot.x - 2, spot.y - 2, spot.radius * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      callusPatches.forEach(c => {
+        if (c.progress < 1) {
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.fillStyle = `rgba(235, 210, 150, ${0.9 - c.progress * 0.8})`;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, c.rx, c.ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = `rgba(180, 140, 80, ${0.7 - c.progress * 0.6})`;
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+
+      nails.forEach((nail) => {
+        ctx.save();
+        ctx.translate(nail.x, nail.y);
+
+        ctx.fillStyle = '#e3b896';
+        ctx.beginPath();
+        ctx.arc(0, 0, nail.width / 2, 0, Math.PI, true);
+        ctx.fill();
+
+        if (!nail.trimmed) {
+          ctx.fillStyle = '#6e563b';
+          ctx.fillRect(-nail.width / 2, -nail.length, nail.width, nail.length);
+          ctx.beginPath();
+          ctx.arc(0, -nail.length, nail.width / 2, Math.PI, 0);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = nail.filed >= 100 ? '#f3e5d8' : '#d4b89c';
+          ctx.fillRect(-nail.width / 2, -5, nail.width, 5);
+
+          if (nail.filed >= 100) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(-nail.width / 4, -4, nail.width / 2, 2);
+          }
+        }
+        ctx.restore();
+      });
+
+      salveShineSpots.forEach(s => {
+        if (s.shined) {
+          ctx.fillStyle = 'rgba(255, 235, 180, 0.6)';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    function drawParticlesAndEffects() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= p.decay;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+      ctx.globalAlpha = 1.0;
+
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y -= 0.8;
+        ft.life -= 0.02;
+
+        ctx.font = 'bold 14px "Cinzel", serif';
+        ctx.fillStyle = ft.color;
+        ctx.globalAlpha = Math.max(0, ft.life);
+        ctx.fillText(ft.text, ft.x, ft.y);
+
+        if (ft.life <= 0) floatingTexts.splice(i, 1);
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    function spawnParticle(x, y, color, count = 3) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x + (Math.random() * 10 - 5),
+          y: y + (Math.random() * 10 - 5),
+          vx: (Math.random() * 2 - 1) * 1.5,
+          vy: (Math.random() * 2 - 1) * 1.5,
+          size: 2 + Math.random() * 3,
+          color: color,
+          life: 1.0,
+          decay: 0.03 + Math.random() * 0.03
+        });
+      }
+    }
+
+    function spawnFloatingText(x, y, text, color = '#f59e0b') {
+      floatingTexts.push({ x, y, text, color, life: 1.0 });
+    }
+
+    /* ==========================================================================
+       INTERACTION & GAME LOGIC
+       ========================================================================== */
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (isGameOver || isGameWon) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      const cursorEl = document.getElementById('customCursor');
+      cursorEl.style.left = `${e.clientX}px`;
+      cursorEl.style.top = `${e.clientY}px`;
+      cursorEl.classList.remove('hidden');
+
+      const dist = Math.hypot(mx - lastMousePos.x, my - lastMousePos.y);
+      mouseSpeed = dist;
+      lastMousePos = { x: mx, y: my };
+
+      const inArchArea = (mx > 400 && mx < 450 && my > 320 && my < 380);
+      if (inArchArea && mouseSpeed > 18 && Date.now() > tickleCooldown) {
+        tickleCooldown = Date.now() + 1200;
+        addAnger(8);
+        playSound('giggle');
+        spawnFloatingText(mx, my - 10, "TICKLE! 🤣", "#ec4899");
+        spawnParticle(mx, my, "#ec4899", 6);
+      }
+
+      if (e.buttons === 1) {
+        handleDragTool(mx, my);
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      document.getElementById('customCursor').classList.add('hidden');
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (isGameOver || isGameWon) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      handleClickTool(mx, my);
+    });
+
+    function handleClickTool(mx, my) {
+      if (!STAGE_CONFIG[currentStage].requiredTools.includes(selectedTool)) {
+        addAnger(10);
+        playSound('grunt');
+        spawnFloatingText(mx, my, "Wrong Tool! ❌", "#ef4444");
+        return;
+      }
+
+      if (currentStage === 3 && selectedTool === 'clipper') {
+        let clippedNail = false;
+        // Apply clipper upgrade bonus range
+        const clipRadius = 22 + (shopState.clipperLevel - 1) * 8;
+
+        nails.forEach(nail => {
+          if (!nail.trimmed) {
+            const dist = Math.hypot(mx - nail.x, my - (nail.y - nail.length));
+            if (dist < clipRadius) {
+              nail.trimmed = true;
+              clippedNail = true;
+              playSound('snip');
+              spawnParticle(nail.x, nail.y - nail.length, '#6e563b', 8);
+              spawnFloatingText(nail.x, nail.y - 20, "SNIP! ✂️", "#f59e0b");
+              score += 50;
+            }
+          }
+        });
+
+        if (!clippedNail) {
+          addAnger(15);
+          playSound('grunt');
+          spawnFloatingText(mx, my, "OUCH! Poked Skin! 🩸", "#ef4444");
+          spawnParticle(mx, my, "#dc2626", 5);
+        }
+
+        checkStageProgress();
+      }
+    }
+
+    function handleDragTool(mx, my) {
+      if (!STAGE_CONFIG[currentStage].requiredTools.includes(selectedTool)) return;
+
+      if (currentStage === 1 && (selectedTool === 'sponge' || selectedTool === 'brush')) {
+        let cleanedAny = false;
+        // Apply sponge upgrade reach bonus
+        const baseReach = selectedTool === 'brush' ? 22 : 18;
+        const reach = baseReach + (shopState.spongeLevel - 1) * 8;
+
+        dirtSpots.forEach(spot => {
+          if (!spot.cleaned) {
+            const dist = Math.hypot(mx - spot.x, my - spot.y);
+            if (dist < spot.radius + reach) {
+              spot.cleaned = true;
+              cleanedAny = true;
+              spawnParticle(spot.x, spot.y, '#5c3a1e', 2);
+            }
+          }
+        });
+
+        if (cleanedAny) {
+          playSound('scrub');
+          score += 5;
+          checkStageProgress();
+        }
+      }
+      else if (currentStage === 2 && selectedTool === 'pumice') {
+        let smoothed = false;
+        callusPatches.forEach(c => {
+          if (c.progress < 1) {
+            const dist = Math.hypot(mx - c.x, my - c.y);
+            if (dist < c.rx + 15) {
+              c.progress += 0.02;
+              smoothed = true;
+              spawnParticle(mx, my, '#e6d0b0', 2);
+            }
+          }
+        });
+
+        if (smoothed) {
+          playSound('scrub');
+          score += 4;
+          checkStageProgress();
+        }
+      }
+      else if (currentStage === 3 && selectedTool === 'file') {
+        let filed = false;
+        nails.forEach(nail => {
+          if (nail.trimmed && nail.filed < 100) {
+            const dist = Math.hypot(mx - nail.x, my - nail.y);
+            if (dist < 20) {
+              nail.filed += 5;
+              filed = true;
+              spawnParticle(nail.x, nail.y, '#ffffff', 2);
+            }
+          }
+        });
+
+        if (filed) {
+          playSound('file');
+          score += 3;
+          checkStageProgress();
+        }
+      }
+      else if (currentStage === 4 && selectedTool === 'salve') {
+        let shined = false;
+        salveShineSpots.forEach(s => {
+          if (!s.shined) {
+            const dist = Math.hypot(mx - s.x, my - s.y);
+            if (dist < 20) {
+              s.shined = true;
+              shined = true;
+              spawnParticle(s.x, s.y, '#fef08a', 2);
+            }
+          }
+        });
+
+        if (shined) {
+          playSound('salve');
+          score += 5;
+          checkStageProgress();
+        }
+      }
+    }
+
+    /* ==========================================================================
+       SHOP SYSTEM LOGIC
+       ========================================================================== */
+    function buyShopItem(item) {
+      if (item === 'sponge') {
+        if (gold >= shopState.spongePrice) {
+          gold -= shopState.spongePrice;
+          shopState.spongeLevel++;
+          shopState.spongePrice = Math.round(shopState.spongePrice * 1.6);
+          document.getElementById('item-sponge-level').innerText = `Owned: Level ${shopState.spongeLevel}`;
+          document.getElementById('price-sponge').innerText = shopState.spongePrice;
+          playSound('stageComplete');
+        } else {
+          alert("Not enough Imperial Gold!");
+        }
+      }
+      else if (item === 'clipper') {
+        if (gold >= shopState.clipperPrice) {
+          gold -= shopState.clipperPrice;
+          shopState.clipperLevel++;
+          shopState.clipperPrice = Math.round(shopState.clipperPrice * 1.6);
+          document.getElementById('item-clipper-level').innerText = `Owned: Level ${shopState.clipperLevel}`;
+          document.getElementById('price-clipper').innerText = shopState.clipperPrice;
+          playSound('stageComplete');
+        } else {
+          alert("Not enough Imperial Gold!");
+        }
+      }
+      else if (item === 'tea') {
+        if (gold >= 75) {
+          gold -= 75;
+          shopState.teaCount++;
+          playSound('salve');
+        } else {
+          alert("Not enough Imperial Gold!");
+        }
+      }
+      else if (item === 'charm') {
+        if (!shopState.hasCharm) {
+          if (gold >= 300) {
+            gold -= 300;
+            shopState.hasCharm = true;
+            document.getElementById('item-charm-status').innerText = "Owned (Active)";
+            document.getElementById('btn-buy-charm').innerText = "SOLD OUT";
+            document.getElementById('btn-buy-charm').disabled = true;
+            playSound('stageComplete');
+          } else {
+            alert("Not enough Imperial Gold!");
+          }
+        }
+      }
+      updateShopUI();
+    }
+
+    function updateShopUI() {
+      document.getElementById('goldDisplay').innerText = gold;
+      document.getElementById('shopGoldDisplay').innerText = gold;
+      
+      const teaBtn = document.getElementById('useTeaBtn');
+      document.getElementById('item-tea-count').innerText = `In Stock: ${shopState.teaCount}`;
+      teaBtn.innerText = `🍵 Drink Calming Tea (${shopState.teaCount})`;
+
+      if (shopState.teaCount > 0 && anger > 0) {
+        teaBtn.disabled = false;
+        teaBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        teaBtn.disabled = true;
+        teaBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function useTea() {
+      if (shopState.teaCount > 0 && anger > 0) {
+        shopState.teaCount--;
+        anger = Math.max(0, anger - 25);
+        playSound('salve');
+        updateUI();
+        updateShopUI();
+        spawnFloatingText(400, 250, "Calming Tea Drunk! -25% Anger 🍵", "#10b981");
+      }
+    }
+
+    /* ==========================================================================
+       PROGRESSION & ANGER SYSTEM
+       ========================================================================== */
+    function checkStageProgress() {
+      let progress = 0;
+
+      if (currentStage === 1) {
+        const cleaned = dirtSpots.filter(s => s.cleaned).length;
+        progress = Math.round((cleaned / dirtSpots.length) * 100);
+      } 
+      else if (currentStage === 2) {
+        const totalProg = callusPatches.reduce((acc, c) => acc + Math.min(1, c.progress), 0);
+        progress = Math.round((totalProg / callusPatches.length) * 100);
+      } 
+      else if (currentStage === 3) {
+        const totalTrimmed = nails.filter(n => n.trimmed).length;
+        const totalFiled = nails.reduce((acc, n) => acc + (n.filed >= 100 ? 1 : 0), 0);
+        progress = Math.round(((totalTrimmed + totalFiled) / (nails.length * 2)) * 100);
+      } 
+      else if (currentStage === 4) {
+        const shined = salveShineSpots.filter(s => s.shined).length;
+        progress = Math.round((shined / salveShineSpots.length) * 100);
+      }
+
+      updateUI(progress);
+
+      if (progress >= 100) {
+        if (currentStage < 4) {
+          setupStage(currentStage + 1);
+        } else {
+          finishGame(true);
+        }
+      }
+    }
+
+    function addAnger(amount) {
+      // If player owns Imperial Charm of Patience, reduce anger gain by 20%
+      let finalAmount = shopState.hasCharm ? amount * 0.8 : amount;
+      anger = Math.min(100, anger + finalAmount);
+      score = Math.max(0, score - finalAmount * 15);
+      updateUI();
+
+      if (anger >= 100) {
+        finishGame(false);
+      }
+    }
+
+    function updateUI(currentStagePct = null) {
+      document.getElementById('angerText').innerText = `${Math.round(anger)}%`;
+      document.getElementById('angerBar').style.width = `${anger}%`;
+
+      const angerContainer = document.getElementById('angerMeterContainer');
+      if (anger >= 70) {
+        angerContainer.classList.add('anger-critical');
+      } else {
+        angerContainer.classList.remove('anger-critical');
+      }
+
+      const moodText = document.getElementById('khanMoodText');
+      if (anger < 25) moodText.innerText = '"Zzz... Khan slumbers peacefully..."';
+      else if (anger < 60) moodText.innerText = '"Grrr... The Khan stirrs in his sleep!"';
+      else if (anger < 90) moodText.innerText = '⚡ "BEWARE! The Great Khan is furious!" ⚡';
+      else moodText.innerText = '🔥 "KHAN IS ABOUT TO AWAKEN!" 🔥';
+
+      const cfg = STAGE_CONFIG[currentStage];
+      document.getElementById('stageTitle').innerText = cfg.title;
+      document.getElementById('stageIcon').innerText = cfg.icon;
+      document.getElementById('stageDesc').innerText = cfg.desc;
+      document.getElementById('canvasStageBanner').innerText = cfg.banner;
+
+      if (currentStagePct !== null) {
+        document.getElementById('stageProgressText').innerText = `${currentStagePct}%`;
+        document.getElementById('stageProgressBar').style.width = `${currentStagePct}%`;
+      }
+
+      const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+      const secs = String(secondsElapsed % 60).padStart(2, '0');
+      document.getElementById('timerText').innerText = `${mins}:${secs}`;
+      document.getElementById('scoreText').innerText = score;
+      document.getElementById('goldDisplay').innerText = gold;
+    }
+
+    function finishGame(won) {
+      isGameOver = !won;
+      isGameWon = won;
+      clearInterval(timerInterval);
+
+      const modal = document.getElementById('resultsModal');
+      const title = document.getElementById('resultTitle');
+      const subtitle = document.getElementById('resultSubtitle');
+      const grade = document.getElementById('resultGrade');
+      const rankBg = document.getElementById('resultRankBg');
+      const comment = document.getElementById('resultComment');
+
+      document.getElementById('finalAngerText').innerText = `${Math.round(anger)}%`;
+      document.getElementById('finalTimeText').innerText = document.getElementById('timerText').innerText;
+
+      if (won) {
+        let goldEarned = 150;
+        if (anger < 20) goldEarned = 250;
+        else if (anger < 50) goldEarned = 180;
+        
+        gold += goldEarned;
+        document.getElementById('finalGoldEarnedText').innerText = `+${goldEarned} 🪙`;
+
+        title.innerText = "✨ Pedicure Complete! ✨";
+        subtitle.innerText = "The Great Khan awakes refreshed and ready to ride!";
+
+        let finalGrade = "S";
+        if (anger > 40 || score < 800) finalGrade = "A";
+        if (anger > 60 || score < 500) finalGrade = "B";
+        if (anger > 80 || score < 300) finalGrade = "C";
+
+        grade.innerText = finalGrade;
+        rankBg.innerText = finalGrade;
+
+        const comments = {
+          S: '"Supreme Service! The Khan appoints you High Vizier of Imperial Podiatry and gifts you extra gold!"',
+          A: '"Excellent Work! The Khan stretches comfortably and awards you a prized Mongolian stallion!"',
+          B: '"Acceptable. The Khan grunts in satisfaction and rewards your efforts."',
+          C: '"Barely Satisfactory. You survived, but the Khan advises you to refine your touch."'
+        };
+        comment.innerText = comments[finalGrade];
+        playSound('stageComplete');
+      } else {
+        document.getElementById('finalGoldEarnedText').innerText = `0 🪙`;
+        title.innerText = "⚡ KHAN EXILED YOU! ⚡";
+        subtitle.innerText = "You angered Genghis Khan with careless foot care!";
+        grade.innerText = "F";
+        rankBg.innerText = "F";
+        comment.innerText = '"You poked the Great Khan\'s foot and scrubbed too roughly! You have been banished across the Gobi Desert!"';
+        playSound('grunt');
+      }
+
+      openModal('resultsModal');
+      updateShopUI();
+    }
+
+    function restartGame() {
+      closeModal('resultsModal');
+      initGame();
+    }
+
+    function openModal(id) {
+      if (id === 'shopModal') updateShopUI();
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    window.onload = function() {
+      initGame();
+      render();
+    };
+  </script>
+</body>
+</html>
